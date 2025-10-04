@@ -14,16 +14,20 @@ import {
 import type { Request } from 'express';
 import { CreateCatDto } from './dto/createCat.dto';
 import { UpdateCatDto } from './dto/updateCat.dto';
+import { CatsService } from './cats.service';
+import { Cat } from './interfaces/cat.interface';
 
 @Controller('cats')
 export class CatController {
+  constructor(private readonly catsService: CatsService) {}
+
   @Get()
   findAll(
     @Req() req: Request,
     @Query('age') age: number,
     @Query('breed') breed: string,
-  ): string {
-    return `This action returns all cats. Age: ${age}, Breed: ${breed}`;
+  ): Cat[] {
+    return this.catsService.findAll();
   }
 
   @Get(':id')
@@ -33,8 +37,8 @@ export class CatController {
 
   @Post()
   @HttpCode(204)
-  create(@Body() createCatDto: CreateCatDto): string {
-    return 'This action adds a new cat';
+  create(@Body() createCatDto: CreateCatDto) {
+    this.catsService.create(createCatDto);
   }
 
   @Put(':id')
