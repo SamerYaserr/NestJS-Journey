@@ -15,17 +15,19 @@ import {
   DefaultValuePipe,
   ParseBoolPipe,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import type { Request } from 'express';
 import { CreateCatDto } from './dto/createCat.dto';
 import { UpdateCatDto } from './dto/updateCat.dto';
 import { CatsService } from './cats.service';
 import { Cat } from './interfaces/cat.interface';
 import { RolesGuard } from 'src/common/guards/roles.gaurd';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { LoggingInterceptor } from 'src/common/Interceptors/logging.interceptor';
 
 @Controller('cats')
 @UseGuards(RolesGuard)
+@UseInterceptors(LoggingInterceptor)
 export class CatController {
   constructor(private readonly catsService: CatsService) {}
   @Get('error')

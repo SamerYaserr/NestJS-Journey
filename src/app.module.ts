@@ -5,15 +5,25 @@ import {
   RequestMethod,
   ValidationPipe,
 } from '@nestjs/common';
-import { APP_FILTER, APP_GUARD, APP_PIPE, HttpAdapterHost } from '@nestjs/core';
-
+import {
+  APP_FILTER,
+  APP_GUARD,
+  APP_INTERCEPTOR,
+  APP_PIPE,
+  HttpAdapterHost,
+} from '@nestjs/core';
 import cors from 'cors';
+
 import { CatModule } from './cats/cats.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { CatController } from './cats/cats.controller';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CatchEverythingFilter } from './common/filters/catch-everything.filter';
 import { AuthGuard } from './common/guards/auth.gaurd';
+import { LoggingInterceptor } from './common/Interceptors/logging.interceptor';
+import { TransformInterceptor } from './common/Interceptors/transform.interceptor';
+import { ExcludeNullInterceptor } from './common/Interceptors/excludeNull.interceptor';
+import { TimeoutInterceptor } from './common/Interceptors/timeout.interceptor';
 
 @Module({
   imports: [CatModule],
@@ -36,6 +46,22 @@ import { AuthGuard } from './common/guards/auth.gaurd';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ExcludeNullInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TimeoutInterceptor,
     },
   ],
 })
