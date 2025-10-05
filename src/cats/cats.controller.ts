@@ -13,6 +13,9 @@ import {
   HttpException,
   HttpStatus,
   UseFilters,
+  ParseIntPipe,
+  DefaultValuePipe,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { CreateCatDto } from './dto/createCat.dto';
@@ -30,9 +33,9 @@ export class CatController {
 
   @Get()
   findAll(
-    @Req() req: Request,
-    @Query('age') age: number,
-    @Query('breed') breed: string,
+    @Query('activeOnly', new DefaultValuePipe(false), ParseBoolPipe)
+    activeOnly: boolean,
+    @Query('page', new DefaultValuePipe(0), ParseIntPipe) page: number,
   ): Cat[] {
     try {
       return this.catsService.findAll();
@@ -51,7 +54,7 @@ export class CatController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): string {
+  findOne(@Param('id', ParseIntPipe) id: number): string {
     return `This action returns a #${id} cat`;
   }
 

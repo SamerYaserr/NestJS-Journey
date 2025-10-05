@@ -3,8 +3,9 @@ import {
   NestModule,
   MiddlewareConsumer,
   RequestMethod,
+  ValidationPipe,
 } from '@nestjs/common';
-import { APP_FILTER, HttpAdapterHost } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE, HttpAdapterHost } from '@nestjs/core';
 
 import cors from 'cors';
 import { CatModule } from './cats/cats.module';
@@ -26,6 +27,10 @@ import { CatchEverythingFilter } from './common/filters/catch-everything.filter'
       useFactory: (httpAdapterHost: HttpAdapterHost) =>
         new CatchEverythingFilter(httpAdapterHost),
       inject: [HttpAdapterHost],
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
     },
   ],
 })
