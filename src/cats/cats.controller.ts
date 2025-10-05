@@ -10,6 +10,9 @@ import {
   Query,
   Put,
   Delete,
+  HttpException,
+  HttpStatus,
+  UseFilters,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { CreateCatDto } from './dto/createCat.dto';
@@ -20,6 +23,10 @@ import { Cat } from './interfaces/cat.interface';
 @Controller('cats')
 export class CatController {
   constructor(private readonly catsService: CatsService) {}
+  @Get('error')
+  throwError() {
+    throw new HttpException('This is a forced error.', HttpStatus.BAD_REQUEST);
+  }
 
   @Get()
   findAll(
@@ -27,7 +34,20 @@ export class CatController {
     @Query('age') age: number,
     @Query('breed') breed: string,
   ): Cat[] {
-    return this.catsService.findAll();
+    try {
+      return this.catsService.findAll();
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: 'This is a custom message',
+        },
+        HttpStatus.FORBIDDEN,
+        {
+          cause: error,
+        },
+      );
+    }
   }
 
   @Get(':id')
