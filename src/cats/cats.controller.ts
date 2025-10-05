@@ -24,6 +24,8 @@ import { Cat } from './interfaces/cat.interface';
 import { RolesGuard } from 'src/common/guards/roles.gaurd';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { LoggingInterceptor } from 'src/common/Interceptors/logging.interceptor';
+import { User } from 'src/common/decorators/user.decorator';
+import { Auth } from 'src/common/decorators/auth.decorator';
 
 @Controller('cats')
 @UseGuards(RolesGuard)
@@ -33,6 +35,12 @@ export class CatController {
   @Get('error')
   throwError() {
     throw new HttpException('This is a forced error.', HttpStatus.BAD_REQUEST);
+  }
+
+  @Get('user')
+  @Auth('admin')
+  findUser(@User() user: string) {
+    return user;
   }
 
   @Get()
