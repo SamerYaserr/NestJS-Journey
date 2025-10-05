@@ -13,6 +13,7 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { CatController } from './cats/cats.controller';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CatchEverythingFilter } from './common/filters/catch-everything.filter';
+import { AuthGuard } from './common/guards/auth.gaurd';
 
 @Module({
   imports: [CatModule],
@@ -31,6 +32,10 @@ import { CatchEverythingFilter } from './common/filters/catch-everything.filter'
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
   ],
 })

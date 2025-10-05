@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Req,
   Post,
   HttpCode,
   Redirect,
@@ -12,18 +11,21 @@ import {
   Delete,
   HttpException,
   HttpStatus,
-  UseFilters,
   ParseIntPipe,
   DefaultValuePipe,
   ParseBoolPipe,
+  UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { CreateCatDto } from './dto/createCat.dto';
 import { UpdateCatDto } from './dto/updateCat.dto';
 import { CatsService } from './cats.service';
 import { Cat } from './interfaces/cat.interface';
+import { RolesGuard } from 'src/common/guards/roles.gaurd';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('cats')
+@UseGuards(RolesGuard)
 export class CatController {
   constructor(private readonly catsService: CatsService) {}
   @Get('error')
@@ -59,6 +61,7 @@ export class CatController {
   }
 
   @Post()
+  @Roles(['admin'])
   @HttpCode(204)
   create(@Body() createCatDto: CreateCatDto) {
     this.catsService.create(createCatDto);
