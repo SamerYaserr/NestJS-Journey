@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import {
   APP_FILTER,
+  APP_GUARD,
   APP_INTERCEPTOR,
   APP_PIPE,
   HttpAdapterHost,
@@ -24,9 +25,11 @@ import { ExcludeNullInterceptor } from './common/Interceptors/excludeNull.interc
 import { TimeoutInterceptor } from './common/Interceptors/timeout.interceptor';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { RolesGuard } from './common/guards/roles.gaurd';
+import { CaslModule } from './casl/casl.module';
 
 @Module({
-  imports: [CatModule, AuthModule, UsersModule],
+  imports: [CatModule, AuthModule, UsersModule, CaslModule],
   controllers: [],
   providers: [
     {
@@ -58,6 +61,10 @@ import { UsersModule } from './users/users.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: TimeoutInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

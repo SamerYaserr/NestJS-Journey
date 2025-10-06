@@ -26,12 +26,22 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { LoggingInterceptor } from 'src/common/Interceptors/logging.interceptor';
 import { User } from 'src/common/decorators/user.decorator';
 import { Auth } from 'src/common/decorators/auth.decorator';
+import { Role } from 'src/common/enums/role.enum';
+import { AppAbility, CaslAbilityFactory } from 'src/casl/casl-ability.factory';
+import { CheckPolicies } from 'src/common/decorators/checkPolicies.decorator';
+import { Article } from 'src/articles/article.class/article.class';
+import { Action } from 'src/common/enums/action.enum';
+import { ReadArticlePolicyHandler } from 'src/casl/handlers/read-article.policy';
 
 @Controller('cats')
 @UseGuards(RolesGuard)
 @UseInterceptors(LoggingInterceptor)
 export class CatController {
-  constructor(private readonly catsService: CatsService) {}
+  constructor(
+    private readonly catsService: CatsService,
+    private caslAbilityFactory: CaslAbilityFactory,
+  ) {}
+
   @Get('error')
   throwError() {
     throw new HttpException('This is a forced error.', HttpStatus.BAD_REQUEST);
@@ -44,6 +54,8 @@ export class CatController {
   }
 
   @Get()
+  @CheckPolicies((ability: AppAbility) => ability.can(Action.Read, Article))
+  @CheckPolicies(new ReadArticlePolicyHandler())
   findAll(
     @Query('activeOnly', new DefaultValuePipe(false), ParseBoolPipe)
     activeOnly: boolean,
@@ -71,7 +83,7 @@ export class CatController {
   }
 
   @Post()
-  @Roles(['admin'])
+  @Roles(Role.Admin)
   @HttpCode(204)
   create(@Body() createCatDto: CreateCatDto) {
     this.catsService.create(createCatDto);
