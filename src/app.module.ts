@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import {
   APP_FILTER,
-  APP_GUARD,
   APP_INTERCEPTOR,
   APP_PIPE,
   HttpAdapterHost,
@@ -19,14 +18,15 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { CatController } from './cats/cats.controller';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CatchEverythingFilter } from './common/filters/catch-everything.filter';
-import { AuthGuard } from './common/guards/auth.gaurd';
 import { LoggingInterceptor } from './common/Interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/Interceptors/transform.interceptor';
 import { ExcludeNullInterceptor } from './common/Interceptors/excludeNull.interceptor';
 import { TimeoutInterceptor } from './common/Interceptors/timeout.interceptor';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [CatModule],
+  imports: [CatModule, AuthModule, UsersModule],
   controllers: [],
   providers: [
     {
@@ -42,10 +42,6 @@ import { TimeoutInterceptor } from './common/Interceptors/timeout.interceptor';
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
     },
     {
       provide: APP_INTERCEPTOR,
