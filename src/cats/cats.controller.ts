@@ -32,8 +32,10 @@ import { CheckPolicies } from 'src/common/decorators/checkPolicies.decorator';
 import { Article } from 'src/articles/article.class/article.class';
 import { Action } from 'src/common/enums/action.enum';
 import { ReadArticlePolicyHandler } from 'src/casl/handlers/read-article.policy';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('cats')
+@SkipThrottle()
 @UseGuards(RolesGuard)
 @UseInterceptors(LoggingInterceptor)
 export class CatController {
@@ -47,12 +49,15 @@ export class CatController {
     throw new HttpException('This is a forced error.', HttpStatus.BAD_REQUEST);
   }
 
+  // Rate limiting is applied to this route.
+  @SkipThrottle({ default: false })
   @Get('user')
   @Auth('admin')
   findUser(@User() user: string) {
     return user;
   }
 
+  // This route will skip rate limiting.
   @Get()
   @CheckPolicies((ability: AppAbility) => ability.can(Action.Read, Article))
   @CheckPolicies(new ReadArticlePolicyHandler())

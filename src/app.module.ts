@@ -27,9 +27,32 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { RolesGuard } from './common/guards/roles.gaurd';
 import { CaslModule } from './casl/casl.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
-  imports: [CatModule, AuthModule, UsersModule, CaslModule],
+  imports: [
+    CatModule,
+    AuthModule,
+    UsersModule,
+    CaslModule,
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 3,
+      },
+      {
+        name: 'medium',
+        ttl: 10000,
+        limit: 20,
+      },
+      {
+        name: 'long',
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
+  ],
   controllers: [],
   providers: [
     {
@@ -65,6 +88,10 @@ import { CaslModule } from './casl/casl.module';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })
